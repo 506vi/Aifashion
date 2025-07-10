@@ -1,0 +1,25 @@
+import openai
+import streamlit as st
+
+openai.api_key = st.secrets["openai_api_key"]
+
+st.title("👕 AI Outfit Stylist")
+st.write("Get outfit suggestions for Indian style.")
+
+query = st.text_input("Describe your outfit need:")
+
+if query:
+    with st.spinner("Generating outfit..."):
+        res = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a fashion stylist for Indian men."},
+                {"role": "user", "content": query}
+            ]
+        )
+        st.subheader("Suggestion:")
+        st.write(res['choices'][0]['message']['content'])
+
+    if st.button("Generate Image"):
+        img = openai.Image.create(prompt=f"Indian man's outfit: {query}", n=1, size="512x512")
+        st.image(img['data'][0]['url'], caption="AI Generated Outfit")
